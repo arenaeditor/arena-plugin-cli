@@ -1,0 +1,66 @@
+{
+  "name": "arena-plugin-cli",
+  "description": "Arena Plugin Dev Command Line Interface",
+  "version": "0.0.13",
+  "author": "ArenaTeam@360.cn",
+  "bin": {
+    "arena-plugin": "./bin/run"
+  },
+  "bugs": "https://github.com/corpcode/arena-plugin/issues",
+  "dependencies": {
+    "@babel/core": "^7.4.5",
+    "@oclif/command": "^1.5.15",
+    "@oclif/config": "^1.13.0",
+    "@oclif/plugin-help": "^2.2.0",
+    "acorn": "^6.1.1",
+    "babel-loader": "^8.0.6",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "cli-ux": "^5.2.2",
+    "memory-fs": "^0.4.1",
+    "node-ipc": "^9.1.1",
+    "terminal-kit": "^1.28.2",
+    "webpack": "^4.35.0"
+  },
+  "devDependencies": {
+    "@oclif/dev-cli": "^1.22.0",
+    "eslint": "^5.16.0",
+    "eslint-config-oclif": "^3.1.0",
+    "globby": "^8.0.2"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/bin",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json",
+    "/src"
+  ],
+  "homepage": "https://github.com/corpcode/arena-plugin",
+  "keywords": [
+    "arena"
+  ],
+  "license": "MIT",
+  "main": "src/index.js",
+  "oclif": {
+    "commands": "./src/commands",
+    "bin": "arena-plugin",
+    "plugins": [
+      "@oclif/plugin-help"
+    ]
+  },
+  "repository": "corpcode/arena-plugin",
+  "scripts": {
+    "postpack": "rm -f oclif.manifest.json",
+    "posttest": "eslint .",
+    "prepack": "oclif-dev manifest && oclif-dev readme",
+    "test": "echo NO TESTS",
+    "version": "oclif-dev readme && git add README.md"
+  },
+  "maintainers": [
+    {
+      "name": "hewenli",
+      "email": "hewenli@360.cn"
+    }
+  ]
+}
