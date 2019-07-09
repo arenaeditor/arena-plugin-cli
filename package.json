@@ -1,7 +1,7 @@
 {
   "name": "arena-plugin-cli",
   "description": "Arena Plugin Dev Command Line Interface",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "author": "ArenaTeam@360.cn",
   "bin": {
     "arena-plugin": "./bin/run"
