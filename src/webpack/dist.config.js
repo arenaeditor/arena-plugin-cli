@@ -1,5 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
+const external = path.resolve(__dirname, './provide.js')
 module.exports = function (config, root) {
   return {
     mode: 'production',
@@ -38,7 +39,8 @@ module.exports = function (config, root) {
     },
     plugins: [
       new webpack.ProvidePlugin({
-        document: [path.resolve(__dirname, './provide.js'), 'document'],
+        document: [external, 'document'],
+        Vue: [external, 'Vue'],
       }),
     ],
   }
