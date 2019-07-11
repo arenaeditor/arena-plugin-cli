@@ -5,3 +5,4 @@
 /tmp
 /yarn.lock
 node_modules
+arena-plugin-cli-*.tgz

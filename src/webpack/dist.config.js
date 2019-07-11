@@ -26,6 +26,18 @@ module.exports = function (config, root) {
             },
           },
         },
+        {
+          test: /\.(png|jpg|gif)$/i,
+          use: [
+            {
+              loader: 'url-loader',
+              options: {
+                quality: 85,
+                limit: Number.MAX_SAFE_INTEGER,
+              },
+            },
+          ],
+        },
       ],
     },
     output: {

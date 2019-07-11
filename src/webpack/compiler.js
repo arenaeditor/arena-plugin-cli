@@ -16,6 +16,7 @@ class ArenaPluginCompiler {
     this.pluginJson = {}
     this.pluginEntry = ''
     this.pluginOutput = ''
+    this.varientConfig = {}
   }
 
   init(projectPath) {
@@ -42,6 +43,33 @@ class ArenaPluginCompiler {
       return '无法读取 plugin.json 指定的入口文件 ->' + this.pluginEntry
     }
 
+    this.pluginJson.plugins = this.pluginJson.plugins.reduce(
+      (result, plugin) => {
+        const configFile = path.resolve(
+          projectPath,
+          'config',
+          `${plugin.config || plugin.name}.json`
+        )
+
+        const configFileExists = fs.existsSync(configFile)
+
+        const data = {...plugin}
+
+        if (configFileExists) {
+          const content = fs.readFileSync(configFile, {encoding: 'utf8'})
+          try {
+            data.config = JSON.parse(content)
+          } catch (error) {
+            data.config = {}
+          }
+        }
+
+        result.push(data)
+        return result
+      },
+      []
+    )
+
     this.pluginOutput = `/plugin-${this.projectId}.js`
     global._pid = this.projectId
     global._name = this.pluginJson.name
@@ -49,18 +77,30 @@ class ArenaPluginCompiler {
     return false
   }
 
-  compile(successCallback, warningCallback, errorCallback, progressCallback, beforeCallback, root) {
+  compile(
+    successCallback,
+    warningCallback,
+    errorCallback,
+    progressCallback,
+    beforeCallback,
+    root
+  ) {
     this.compiler = webpack(
-      webpackConfig({
-        entry: this.pluginEntry,
-        id: this.projectId,
-        dist: '/',
-      }, root)
+      webpackConfig(
+        {
+          entry: this.pluginEntry,
+          id: this.projectId,
+          dist: '/',
+        },
+        root
+      )
     )
     this.compiler.outputFileSystem = memfs
-    this.compiler.apply(new WebpackProgressPlugin(percentage => {
-      progressCallback(percentage)
-    }))
+    this.compiler.apply(
+      new WebpackProgressPlugin(percentage => {
+        progressCallback(percentage)
+      })
+    )
 
     this.compiler.hooks.beforeCompile.tap('plugin', () => {
       beforeCallback()

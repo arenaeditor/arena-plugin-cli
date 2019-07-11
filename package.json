@@ -16,9 +16,11 @@
     "babel-loader": "^8.0.6",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "cli-ux": "^5.2.2",
+    "file-loader": "^4.0.0",
     "memory-fs": "^0.4.1",
     "node-ipc": "^9.1.1",
     "terminal-kit": "^1.28.2",
+    "url-loader": "^2.0.1",
     "webpack": "^4.35.0"
   },
   "devDependencies": {
@@ -28,7 +30,7 @@
     "globby": "^8.0.2"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=9.0.0"
   },
   "files": [
     "/bin",
