@@ -12,7 +12,7 @@ class DevCommand extends Command {
     }
 
     t.newPbar()
-    t.fs()
+    // t.fs()
     t.headerDev()
 
     await ipc.connect()
