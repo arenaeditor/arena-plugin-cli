@@ -5,6 +5,7 @@ const path = require('path')
 const fs = require('fs')
 const crypto = require('crypto')
 const MemoryFS = require('memory-fs')
+const pkg = require('../../package.json')
 
 const memfs = new MemoryFS()
 
@@ -12,11 +13,13 @@ class ArenaPluginCompiler {
   constructor() {
     this.compiler = null
     this.projectId = ''
+    this.projectPath = ''
     this.pluginJsonPath = ''
     this.pluginJson = {}
     this.pluginEntry = ''
     this.pluginOutput = ''
     this.varientConfig = {}
+    this.styleEntries = {}
   }
 
   init(projectPath) {
@@ -24,6 +27,8 @@ class ArenaPluginCompiler {
     .createHash('md5')
     .update(projectPath)
     .digest('hex')
+
+    this.projectPath = projectPath
 
     this.pluginJsonPath = path.resolve(projectPath, 'plugin.json')
     if (!fs.existsSync(this.pluginJsonPath)) {
@@ -48,7 +53,7 @@ class ArenaPluginCompiler {
         const configFile = path.resolve(
           projectPath,
           'config',
-          `${plugin.config || plugin.name}.json`
+          `${plugin.config || plugin.export}.json`
         )
 
         const configFileExists = fs.existsSync(configFile)
@@ -70,11 +75,28 @@ class ArenaPluginCompiler {
       []
     )
 
-    this.pluginOutput = `/plugin-${this.projectId}.js`
+    this.pluginOutput = `/plugin-${this.projectId}.compiled`
     global._pid = this.projectId
     global._name = this.pluginJson.name
 
     return false
+  }
+
+  getStyleEntries() {
+    return this.pluginJson.plugins.reduce((result, plugin) => {
+      const stylePath = path.resolve(
+        this.projectPath,
+        'style',
+        `${plugin.export}.scss`
+      )
+
+      const styleExists = fs.existsSync(stylePath)
+
+      if (styleExists) {
+        result[plugin.export] = stylePath
+      }
+      return result
+    }, {})
   }
 
   compile(
@@ -85,12 +107,15 @@ class ArenaPluginCompiler {
     beforeCallback,
     root
   ) {
+    this.styleEntries = this.getStyleEntries()
+
     this.compiler = webpack(
       webpackConfig(
         {
           entry: this.pluginEntry,
           id: this.projectId,
           dist: '/',
+          extendedEntries: {...this.styleEntries},
         },
         root
       )
@@ -103,6 +128,10 @@ class ArenaPluginCompiler {
     )
 
     this.compiler.hooks.beforeCompile.tap('plugin', () => {
+      beforeCallback()
+    })
+
+    this.compiler.hooks.beforeCompile.tap('default', () => {
       beforeCallback()
     })
 
@@ -123,13 +152,36 @@ class ArenaPluginCompiler {
       //   warningCallback(stats.toJson().warnings)
       // }
 
+      // 插件JS
       const content = memfs.readFileSync(this.pluginOutput, 'utf-8')
+
+      // 样式
+      const styleContent = Object.entries(this.styleEntries).map(
+        ([key]) => {
+          const file = `/${key}_style.css`
+          const exists = memfs.existsSync(file)
+          const data = {
+            varient: key,
+            style: '',
+          }
+
+          if (exists) {
+            data.style = memfs.readFileSync(file, 'utf-8')
+          }
+
+          return data
+        }
+      )
+
       const plugin = {
         code: content,
+        styles: styleContent,
         id: this.projectId,
         config: this.pluginJson,
         type: 'dev',
+        cliVersion: pkg.version,
       }
+      // console.log(plugin)
       successCallback(JSON.stringify(plugin))
     })
   }

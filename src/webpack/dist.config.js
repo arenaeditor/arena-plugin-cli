@@ -1,5 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const external = path.resolve(__dirname, './provide.js')
 module.exports = function (config, root) {
   return {
@@ -7,6 +8,7 @@ module.exports = function (config, root) {
     devtool: false,
     entry: {
       plugin: config.entry,
+      ...config.extendedEntries,
     },
     module: {
       rules: [
@@ -38,10 +40,29 @@ module.exports = function (config, root) {
             },
           ],
         },
+        {
+          test: /\.(sa|sc|c)ss$/,
+          use: [
+            {
+              loader: MiniCssExtractPlugin.loader,
+            },
+            'css-loader',
+            {
+              loader: 'postcss-loader',
+              options: {
+                ident: 'postcss',
+                plugins: [
+                  require('postcss-prefix-selector')({prefix: `[arena-scope="${config.id}"]`}),
+                ],
+              },
+            },
+            'sass-loader',
+          ],
+        },
       ],
     },
     output: {
-      filename: `plugin-${config.id}.js`,
+      filename: `[name]-${config.id}.compiled`,
       path: config.dist,
       library: config.id,
       libraryTarget: 'window',
@@ -53,6 +74,9 @@ module.exports = function (config, root) {
       new webpack.ProvidePlugin({
         document: [external, 'document'],
         Vue: [external, 'Vue'],
+      }),
+      new MiniCssExtractPlugin({
+        filename: '[name]_style.css',
       }),
     ],
   }
