@@ -5,7 +5,7 @@ const t = require('../ui')
 
 class DevCommand extends Command {
   async run() {
-    const initError = webpackCompiler.init(process.cwd())
+    const initError = await webpackCompiler.init(process.cwd())
     if (initError) {
       this.error(initError)
       return
