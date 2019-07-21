@@ -25,11 +25,6 @@ class ArenaPluginCompiler {
   }
 
   async init(projectPath) {
-    this.projectId = crypto
-      .createHash('md5')
-      .update(projectPath)
-      .digest('hex')
-
     this.projectPath = projectPath
 
     this.pluginJsonPath = path.resolve(projectPath, 'plugin.json')
@@ -63,6 +58,11 @@ class ArenaPluginCompiler {
         this.pluginJson.icon = `data:image/png;base64,${buffer.toString('base64')}`
       }
     }
+
+    this.projectId = this.pluginJson.pluginId || crypto
+      .createHash('md5')
+      .update(projectPath)
+      .digest('hex')
 
     this.pluginJson.plugins = this.pluginJson.plugins.reduce(
       (result, plugin) => {
