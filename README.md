@@ -19,7 +19,7 @@ $ npm install -g arena-plugin-cli
 $ arena-plugin COMMAND
 running command...
 $ arena-plugin (-v|--version|version)
-arena-plugin-cli/0.0.21 darwin-x64 node-v8.12.0
+arena-plugin-cli/0.0.22 darwin-x64 node-v8.12.0
 $ arena-plugin --help [COMMAND]
 USAGE
   $ arena-plugin COMMAND
@@ -48,7 +48,7 @@ DESCRIPTION
   Build production Arena plugin
 ```
 
-_See code: [src/commands/build.js](https://github.com/corpcode/arena-plugin/blob/v0.0.21/src/commands/build.js)_
+_See code: [src/commands/build.js](https://github.com/corpcode/arena-plugin/blob/v0.0.22/src/commands/build.js)_
 
 ## `arena-plugin dev`
 
@@ -68,7 +68,7 @@ DESCRIPTION
   	once the plugin is ready, plugin button will appear at the top of the app.
 ```
 
-_See code: [src/commands/dev.js](https://github.com/corpcode/arena-plugin/blob/v0.0.21/src/commands/dev.js)_
+_See code: [src/commands/dev.js](https://github.com/corpcode/arena-plugin/blob/v0.0.22/src/commands/dev.js)_
 
 ## `arena-plugin help [COMMAND]`
 
@@ -99,7 +99,7 @@ DESCRIPTION
   Create an new empty Arena plugin project in current directory
 ```
 
-_See code: [src/commands/init.js](https://github.com/corpcode/arena-plugin/blob/v0.0.21/src/commands/init.js)_
+_See code: [src/commands/init.js](https://github.com/corpcode/arena-plugin/blob/v0.0.22/src/commands/init.js)_
 
 ## `arena-plugin install APFN`
 
@@ -117,7 +117,7 @@ DESCRIPTION
   Install a .arenap to Arena Editor
 ```
 
-_See code: [src/commands/install.js](https://github.com/corpcode/arena-plugin/blob/v0.0.21/src/commands/install.js)_
+_See code: [src/commands/install.js](https://github.com/corpcode/arena-plugin/blob/v0.0.22/src/commands/install.js)_
 
 ## `arena-plugin selfhost`
 
@@ -128,5 +128,5 @@ USAGE
   $ arena-plugin selfhost
 ```
 
-_See code: [src/commands/selfhost.js](https://github.com/corpcode/arena-plugin/blob/v0.0.21/src/commands/selfhost.js)_
+_See code: [src/commands/selfhost.js](https://github.com/corpcode/arena-plugin/blob/v0.0.22/src/commands/selfhost.js)_
 <!-- commandsstop -->
