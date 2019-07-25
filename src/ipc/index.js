@@ -2,7 +2,7 @@ const ipc = require('node-ipc')
 const fs = require('fs')
 // const unixSocketPath = '/tmp/cn.360.arena.plugin'
 const connectionId = 'ArenaPluginSocketService'
-const universalTCPPort = 9999;
+const universalTCPPort = 9999
 ipc.config.encoding = 'utf8'
 ipc.config.silent = true
 ipc.config.id = Math.random().toString(36).slice(2)
@@ -22,6 +22,10 @@ class ArenaPluginIPCClient {
         resolve()
       })
     })
+  }
+
+  disconnect() {
+    ipc.disconnect(connectionId)
   }
 
   sendData(data) {

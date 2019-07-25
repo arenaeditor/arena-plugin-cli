@@ -122,6 +122,7 @@ class ArenaPluginCompiler {
     progressCallback,
     beforeCallback,
     root,
+    prod = false,
   ) {
     this.styleEntries = this.getStyleEntries()
 
@@ -134,6 +135,7 @@ class ArenaPluginCompiler {
           extendedEntries: {...this.styleEntries},
         },
         root,
+        prod,
       ),
     )
     this.compiler.outputFileSystem = memfs
@@ -151,7 +153,7 @@ class ArenaPluginCompiler {
       beforeCallback()
     })
 
-    this.compiler.watch({}, (err, stats) => {
+    this.close = this.compiler.watch({}, (err, stats) => {
       if (err) {
         if (err.details) {
           errorCallback(err.details)
@@ -202,8 +204,16 @@ class ArenaPluginCompiler {
     })
   }
 
+  stop() {
+    this.close && this.close.close(() => {})
+  }
+
   get id() {
     return this.projectId
+  }
+
+  get pjson() {
+    return this.pluginJson
   }
 }
 

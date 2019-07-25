@@ -2,8 +2,9 @@ const path = require('path')
 const webpack = require('webpack')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const external = path.resolve(__dirname, './provide.js')
-module.exports = function (config, root) {
-  return {
+const TerserPlugin = require('terser-webpack-plugin')
+module.exports = function (config, root, prod) {
+  const cfg = {
     mode: 'production',
     devtool: false,
     entry: {
@@ -22,7 +23,7 @@ module.exports = function (config, root) {
                 path.resolve(
                   root,
                   'node_modules',
-                  'babel-plugin-transform-class-properties'
+                  'babel-plugin-transform-class-properties',
                 ),
               ],
             },
@@ -80,4 +81,12 @@ module.exports = function (config, root) {
       }),
     ],
   }
+
+  if (prod) {
+    cfg.optimization = {
+      minimizer: [new TerserPlugin()],
+    }
+  }
+
+  return cfg
 }

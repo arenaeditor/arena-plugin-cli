@@ -1,9 +1,11 @@
 const {Command} = require('@oclif/command')
 const webpackCompiler = require('../webpack/compiler')
-const ipc = require('../ipc')
 const t = require('../ui')
+const zlib = require('zlib')
+const fs = require('fs')
+const path = require('path')
 
-class DevCommand extends Command {
+class BuildCommand extends Command {
   async run() {
     const initError = await webpackCompiler.init(process.cwd())
     if (initError) {
@@ -14,15 +16,13 @@ class DevCommand extends Command {
     t.newPbar()
     t.headerDev()
 
-    await ipc.connect()
-
     webpackCompiler.compile(
       this.compileSuccess.bind(this),
       this.compileWarning.bind(this),
       this.compileError.bind(this),
       this.compileProgress.bind(this),
       this.compileStart.bind(this),
-      this.config.root
+      this.config.root,
     )
   }
 
@@ -37,10 +37,14 @@ class DevCommand extends Command {
 
   compileSuccess(content) {
     t.headerDev()
-    t.term.defaultColor('✌️\t').bgBrightGreen('编译成功\n')
-    const err = ipc.sendData(content)
-    if (err) this.compileError(err)
-    else t.term.defaultColor('🚗\t').bgBrightGreen('已更新到 Arena')
+    t.term.defaultColor('✌️\t').bgBrightGreen('打包完成\n')
+    webpackCompiler.stop()
+
+    // compress
+    const contentBuffer = Buffer.from(content, 'utf8')
+    const compressedBuffer = zlib.deflateSync(contentBuffer)
+    const savePath = path.resolve(process.cwd(), `${webpackCompiler.id}${webpackCompiler.pjson.version ? '-' + webpackCompiler.pjson.version : ''}.arenap`);
+    fs.writeFileSync(savePath, compressedBuffer)
   }
 
   compileWarning(content) {
@@ -52,14 +56,9 @@ class DevCommand extends Command {
   }
 }
 
-DevCommand.description = `Develope your Arena plugins with hot reload.
-Develope your Arena plugins with hot reload, run this command under your project folder.
-Before you run this command, you need to:
-1. Create plugin.json and plugin entry file,
-\t you can also run <new> command to create a new plugin project.
-
-2. Open Arena, and run this command,
-\t once the plugin is ready, plugin button will appear at the top of the app.
+BuildCommand.description = `Build production plugin
+...
+Build production Arena plugin
 `
 
-module.exports = DevCommand
+module.exports = BuildCommand

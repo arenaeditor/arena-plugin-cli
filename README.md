@@ -28,10 +28,27 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
+* [`arena-plugin build`](#arena-plugin-build)
 * [`arena-plugin dev`](#arena-plugin-dev)
 * [`arena-plugin help [COMMAND]`](#arena-plugin-help-command)
 * [`arena-plugin init`](#arena-plugin-init)
+* [`arena-plugin install APFN`](#arena-plugin-install-apfn)
 * [`arena-plugin selfhost`](#arena-plugin-selfhost)
+
+## `arena-plugin build`
+
+Build production plugin
+
+```
+USAGE
+  $ arena-plugin build
+
+DESCRIPTION
+  ...
+  Build production Arena plugin
+```
+
+_See code: [src/commands/build.js](https://github.com/corpcode/arena-plugin/blob/v0.0.21/src/commands/build.js)_
 
 ## `arena-plugin dev`
 
@@ -83,6 +100,24 @@ DESCRIPTION
 ```
 
 _See code: [src/commands/init.js](https://github.com/corpcode/arena-plugin/blob/v0.0.21/src/commands/init.js)_
+
+## `arena-plugin install APFN`
+
+Install a plugin to Arena Editor
+
+```
+USAGE
+  $ arena-plugin install APFN
+
+ARGUMENTS
+  APFN  The plugin file you want to install
+
+DESCRIPTION
+  ...
+  Install a .arenap to Arena Editor
+```
+
+_See code: [src/commands/install.js](https://github.com/corpcode/arena-plugin/blob/v0.0.21/src/commands/install.js)_
 
 ## `arena-plugin selfhost`
 
