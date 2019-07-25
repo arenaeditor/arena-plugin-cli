@@ -1,5 +1,4 @@
 const ipc = require('node-ipc')
-const fs = require('fs')
 // const unixSocketPath = '/tmp/cn.360.arena.plugin'
 const connectionId = 'ArenaPluginSocketService'
 const universalTCPPort = 9999
@@ -19,7 +18,7 @@ class ArenaPluginIPCClient {
     // }
     return new Promise(resolve => {
       ipc.connectToNet(connectionId, undefined, universalTCPPort, () => {
-        resolve()
+        ipc.of[connectionId].on('connect', () => resolve())
       })
     })
   }
