@@ -9,7 +9,7 @@ const pkg = require('../../package.json')
 const Sharp = require('sharp')
 
 const memfs = new MemoryFS()
-const supportedIconExtension = ['png', 'jpg', 'jpeg']
+const supportedIconExtension = ['.png', '.jpg', '.jpeg']
 
 class ArenaPluginCompiler {
   constructor() {
@@ -46,7 +46,7 @@ class ArenaPluginCompiler {
     }
 
     if (this.pluginJson.icon) {
-      const iconPath = path.resolve(projectPath)
+      const iconPath = path.resolve(projectPath, this.pluginJson.icon)
       const ext = path.extname(iconPath)
       if (fs.existsSync(iconPath) && supportedIconExtension.includes(ext)) {
         const sharp = new Sharp(iconPath)
@@ -56,6 +56,22 @@ class ArenaPluginCompiler {
           .toBuffer()
 
         this.pluginJson.icon = `data:image/png;base64,${buffer.toString('base64')}`
+      }
+    }
+
+    for (let index = 0; index < this.pluginJson.plugins.length; index += 1) {
+      const pluginIcon = this.pluginJson.plugins[index].icon
+      if (pluginIcon) {
+        const iconPath = path.resolve(projectPath, pluginIcon)
+        const ext = path.extname(iconPath)
+        if (fs.existsSync(iconPath) && supportedIconExtension.includes(ext)) {
+          const sharp = new Sharp(iconPath)
+          const buffer = await sharp
+            .resize({width: 64, height: 64, fit: 'cover'})
+            .png({quality: 85})
+            .toBuffer()
+          this.pluginJson.plugins[index].icon = `data:image/png;base64,${buffer.toString('base64')}`
+        }
       }
     }
 
@@ -200,12 +216,14 @@ class ArenaPluginCompiler {
         cliVersion: pkg.version,
       }
       // console.log(plugin)
-      successCallback(JSON.stringify(plugin))
+      successCallback(prod ? plugin : JSON.stringify(plugin))
+      // successCallback(JSON.stringify(plugin))
     })
   }
 
   stop() {
-    this.close && this.close.close(() => {})
+    this.close && this.close.close(() => {
+    })
   }
 
   get id() {

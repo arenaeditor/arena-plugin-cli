@@ -43,6 +43,10 @@ Build production plugin
 USAGE
   $ arena-plugin build
 
+OPTIONS
+  -b, --bump=patch|minor|major  [default: patch] Auto versioning
+  -d, --delete                  Delete old version
+
 DESCRIPTION
   ...
   Build production Arena plugin
