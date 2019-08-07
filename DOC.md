@@ -194,7 +194,7 @@ group包含三种形态
 第二种形态为带代码块的折叠面板**EditorBoxGroup**, 这种形式的Group需要传EditorBoxGroup的第二个参数, 当前折叠面板的名字, 作用是通过这个名字来获取代码块的值. 如下面的折叠面板通过 $arena.data.text 获得折叠面板代码块中的值. 
 
 ```javascript
-import { ArenaPluginDOM, Group, Item } from 'arena-types'
+import { ArenaPluginDOM, EditorBoxGroup, Item } from 'arena-types'
 class Text extends ArenaPluginDOM {}
 Text.panel = () => {
   // 在这里定义为代码块的折叠面板, 同时传递一个name为text
@@ -207,7 +207,7 @@ Text.panel = () => {
 第三种形态为带tab切换的折叠面板**TabBoxGroup**, 这种形式的Group需要在给组件传递value的时候传递一个value数组, 数组的长度将设定为tab页的数量. 如下的tab页数量为两个, 每一个tab页有一个文字的input, 第一个tab中的input的值为'文字1', 第二个的值为'文字2'.
 
 ```javascript
-import { ArenaPluginDOM, Group, Item } from 'arena-types'
+import { ArenaPluginDOM, TabBoxGroup, Item } from 'arena-types'
 class Text extends ArenaPluginDOM {}
 Text.panel = () => {
   // 在这里定义为tab页的折叠面板
