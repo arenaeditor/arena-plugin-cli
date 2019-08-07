@@ -72,9 +72,12 @@ module.exports = function (config, root, prod) {
       modules: [path.resolve(root, 'node_modules')],
     },
     plugins: [
+      // new webpack.NormalModuleReplacementPlugin(/arena-types/, './types.js'),
+      // new webpack.IgnorePlugin('arena-types'),
       new webpack.ProvidePlugin({
         document: [external, 'document'],
         Vue: [external, 'Vue'],
+        // 'arena-types': [external, 'types'],
       }),
       new MiniCssExtractPlugin({
         filename: '[name]_style.css',
