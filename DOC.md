@@ -208,8 +208,13 @@ class Text extends ArenaPluginDOM {}
 Text.panel = () => {
   // 在这里定义为代码块的折叠面板, 同时传递一个name为text
   const group = new EditorBoxGroup('文字', 'text')
-  const item = new Item('input', 'content')
-  group.add(item)
+  const item = new Item('input', 'content', {}, {
+      schema: {
+        type: 'string',
+      },
+    },
+  );
+  group.add([item])
   return [group]
 }
 ```
@@ -221,8 +226,13 @@ class Text extends ArenaPluginDOM {}
 Text.panel = () => {
   // 在这里定义为tab页的折叠面板
   const group = new TabBoxGroup('文字')
-  const item = new Item('input', 'content')
-  group.add(item)
+  const item = new Item('input', 'content', {}, {
+      schema: {
+        type: 'string',
+      },
+    },
+  );
+  group.add([item])
   return [group]
 }
 Text.presets = {
