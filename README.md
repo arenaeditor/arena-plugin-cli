@@ -19,7 +19,7 @@ $ npm install -g arena-plugin-cli
 $ arena-plugin COMMAND
 running command...
 $ arena-plugin (-v|--version|version)
-arena-plugin-cli/0.0.24 darwin-x64 node-v8.12.0
+arena-plugin-cli/0.0.24 darwin-x64 node-v10.14.1
 $ arena-plugin --help [COMMAND]
 USAGE
   $ arena-plugin COMMAND

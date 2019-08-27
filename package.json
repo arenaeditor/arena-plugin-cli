@@ -9,6 +9,7 @@
   "bugs": "https://github.com/corpcode/arena-plugin/issues",
   "dependencies": {
     "@babel/core": "^7.4.5",
+    "@babel/plugin-transform-react-jsx": "^7.3.0",
     "@oclif/command": "^1.5.15",
     "@oclif/config": "^1.13.0",
     "@oclif/plugin-help": "^2.2.0",
