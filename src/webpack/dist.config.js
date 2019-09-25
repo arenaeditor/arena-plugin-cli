@@ -76,6 +76,9 @@ module.exports = function (config, root, prod) {
     resolveLoader: {
       modules: [path.resolve(root, 'node_modules')],
     },
+    resolve: {
+      extensions: ['.js', '.jsx', '.arena.jsx', '.arena.jsx', '.json'],
+    },
     plugins: [
       // new webpack.NormalModuleReplacementPlugin(/arena-types/, './types.js'),
       // new webpack.IgnorePlugin('arena-types'),
