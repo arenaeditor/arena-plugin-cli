@@ -64,6 +64,55 @@ class BuildCommand extends Command {
     const compressedBuffer = zlib.deflateSync(contentBuffer)
     const savePath = path.resolve(process.cwd(), `${webpackCompiler.id}${content.config.version ? '-' + content.config.version : ''}.arenap`)
     fs.writeFileSync(savePath, compressedBuffer)
+    // const v1struct = {
+    //   VERSION: 2,
+    //   CONFIG_LEN: 4,
+    //   FIXED_LEN: 2 + 4,
+    // };
+
+    // const defaultDir = path.resolve(process.cwd(), 'app/static/thumb');
+    
+    // let range = 0;
+    // const collectedResources = fs.readdirSync(defaultDir)
+    //   .filter(f => !f.startsWith('.'))
+    //   .map((f) => {
+    //     const fstate = fs.statSync(path.resolve(defaultDir, f));
+    //     const stat = {
+    //       name: f,
+    //       size: fstate.size,
+    //       from: range,
+    //     };
+
+    //     range += fstate.size;
+    //     return stat;
+    //   });
+
+    // const f_identifiers = JSON.stringify(content);
+    // const f_identifiers_buffer = zlib.deflateSync((Buffer.from(f_identifiers, 'utf8')));
+    // const f_length = f_identifiers_buffer.length;
+
+    // const f_iv_fixed_buffer = Buffer.alloc(v1struct.VERSION);
+    // const f_il_fixed_buffer = Buffer.alloc(v1struct.CONFIG_LEN);
+
+    // f_iv_fixed_buffer.writeUInt16LE(1);
+    // f_il_fixed_buffer.writeUInt32LE(f_length);
+
+    // const f = fs.createWriteStream(
+    //   path.resolve(process.cwd(), `${webpackCompiler.id}${content.config.version ? '-' + content.config.version : ''}.arenap`),
+    // );
+
+    // f.write(f_iv_fixed_buffer);
+    // f.write(f_il_fixed_buffer);
+    // f.write(f_identifiers_buffer);
+
+    // collectedResources.forEach((fd) => {
+    //   const file = path.resolve(defaultDir, fd.name);
+    //   const f_buffer = fs.readFileSync(file);
+    //   f.write(f_buffer);
+    // });
+
+    // f.end();
+    // f.close();
   }
 
   compileWarning(content) {

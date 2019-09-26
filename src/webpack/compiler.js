@@ -70,7 +70,20 @@ class ArenaPluginCompiler {
             .resize({width: 64, height: 64, fit: 'cover'})
             .png({quality: 85})
             .toBuffer()
-          this.pluginJson.plugins[index].icon = `data:image/png;base64,${buffer.toString('base64')}`
+          this.pluginJson.plugins[index].icon = `data:image/png;base64,${buffer.toString('base64')}`;
+        }
+      }
+      const pluginThumb = this.pluginJson.plugins[index].thumb
+      if (pluginThumb) {
+        const thumbPath = path.resolve(projectPath, pluginThumb)
+        const ext = path.extname(thumbPath)
+        if (fs.existsSync(thumbPath) && supportedIconExtension.includes(ext)) {
+          const sharp = new Sharp(thumbPath)
+          const buffer = await sharp
+            .png({quality: 85})
+            .toBuffer()
+
+          this.pluginJson.plugins[index].thumb = `data:image/png;base64,${buffer.toString('base64')}`;
         }
       }
     }
