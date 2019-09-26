@@ -19,7 +19,7 @@ $ npm install -g arena-plugin-cli
 $ arena-plugin COMMAND
 running command...
 $ arena-plugin (-v|--version|version)
-arena-plugin-cli/0.0.25 darwin-x64 node-v10.14.1
+arena-plugin-cli/0.0.25 darwin-x64 node-v12.6.0
 $ arena-plugin --help [COMMAND]
 USAGE
   $ arena-plugin COMMAND
@@ -29,6 +29,7 @@ USAGE
 # Commands
 <!-- commands -->
 * [`arena-plugin build`](#arena-plugin-build)
+* [`arena-plugin build-theme`](#arena-plugin-build-theme)
 * [`arena-plugin dev`](#arena-plugin-dev)
 * [`arena-plugin help [COMMAND]`](#arena-plugin-help-command)
 * [`arena-plugin init`](#arena-plugin-init)
@@ -53,6 +54,21 @@ DESCRIPTION
 ```
 
 _See code: [src/commands/build.js](https://github.com/corpcode/arena-plugin/blob/v0.0.25/src/commands/build.js)_
+
+## `arena-plugin build-theme`
+
+Building apt files from themes section
+
+```
+USAGE
+  $ arena-plugin build-theme
+
+DESCRIPTION
+  ...
+  Build all available theme from themes section in plugin.json
+```
+
+_See code: [src/commands/build-theme.js](https://github.com/corpcode/arena-plugin/blob/v0.0.25/src/commands/build-theme.js)_
 
 ## `arena-plugin dev`
 
@@ -89,7 +105,7 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.0/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.1/src/commands/help.ts)_
 
 ## `arena-plugin init`
 
