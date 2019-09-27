@@ -14,7 +14,23 @@ module.exports = function (config, root, prod) {
     module: {
       rules: [
         {
-          test: /\.jsx?$/,
+          test: /\.js$/,
+          exclude: /node_modules/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              plugins: [
+                path.resolve(
+                  root,
+                  'node_modules',
+                  'babel-plugin-transform-class-properties',
+                ),
+              ],
+            },
+          },
+        },
+        {
+          test: /\.arena\.jsx$/,
           exclude: /node_modules/,
           use: {
             loader: 'babel-loader',
@@ -25,11 +41,6 @@ module.exports = function (config, root, prod) {
                   "pragmaFrag": "ArenaPluginTrans.f", // default is React.Fragment
                   "throwIfNamespace": false // defaults to true
                 }],
-                path.resolve(
-                  root,
-                  'node_modules',
-                  'babel-plugin-transform-class-properties',
-                ),
               ],
             },
           },
