@@ -63,6 +63,7 @@ class BuildThemeCommand extends Command {
         from: range,
         size: thumbBuffer.length,
       }
+      config.thumb = `${varient}.png`
 
       thumbBuffers.push(thumbBuffer)
       range += thumbBuffer.length
@@ -78,6 +79,7 @@ class BuildThemeCommand extends Command {
         size: thumbBuffer.length,
       }
 
+      themeJson.thumb = 'plugin_thumb.png';
       thumbBuffers.push(thumbBuffer)
     }
 
