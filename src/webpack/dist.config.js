@@ -46,7 +46,7 @@ module.exports = function (config, root, prod) {
           },
         },
         {
-          test: /\.(png|jpg|gif)$/i,
+          test: /\.(png|jpg|gif|eot|ttf|woff|woff2|svg)$/i,
           use: [
             {
               loader: 'url-loader',
