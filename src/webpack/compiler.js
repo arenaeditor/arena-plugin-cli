@@ -59,34 +59,34 @@ class ArenaPluginCompiler {
       }
     }
 
-    for (let index = 0; index < this.pluginJson.plugins.length; index += 1) {
-      const pluginIcon = this.pluginJson.plugins[index].icon
-      if (pluginIcon) {
-        const iconPath = path.resolve(projectPath, pluginIcon)
-        const ext = path.extname(iconPath)
-        if (fs.existsSync(iconPath) && supportedIconExtension.includes(ext)) {
-          const sharp = new Sharp(iconPath)
-          const buffer = await sharp
-            .resize({width: 64, height: 64, fit: 'cover'})
-            .png({quality: 85})
-            .toBuffer()
-          this.pluginJson.plugins[index].icon = `data:image/png;base64,${buffer.toString('base64')}`;
-        }
-      }
-      const pluginThumb = this.pluginJson.plugins[index].thumb
-      if (pluginThumb) {
-        const thumbPath = path.resolve(projectPath, pluginThumb)
-        const ext = path.extname(thumbPath)
-        if (fs.existsSync(thumbPath) && supportedIconExtension.includes(ext)) {
-          const sharp = new Sharp(thumbPath)
-          const buffer = await sharp
-            .png({quality: 85})
-            .toBuffer()
-
-          this.pluginJson.plugins[index].thumb = `data:image/png;base64,${buffer.toString('base64')}`;
-        }
-      }
-    }
+    // for (let index = 0; index < this.pluginJson.plugins.length; index += 1) {
+    //   const pluginIcon = this.pluginJson.plugins[index].icon
+    //   if (pluginIcon) {
+    //     const iconPath = path.resolve(projectPath, pluginIcon)
+    //     const ext = path.extname(iconPath)
+    //     if (fs.existsSync(iconPath) && supportedIconExtension.includes(ext)) {
+    //       const sharp = new Sharp(iconPath)
+    //       const buffer = await sharp
+    //         .resize({width: 64, height: 64, fit: 'cover'})
+    //         .png({quality: 85})
+    //         .toBuffer()
+    //       this.pluginJson.plugins[index].icon = `data:image/png;base64,${buffer.toString('base64')}`;
+    //     }
+    //   }
+    //   const pluginThumb = this.pluginJson.plugins[index].thumb
+    //   if (pluginThumb) {
+    //     const thumbPath = path.resolve(projectPath, pluginThumb)
+    //     const ext = path.extname(thumbPath)
+    //     if (fs.existsSync(thumbPath) && supportedIconExtension.includes(ext)) {
+    //       const sharp = new Sharp(thumbPath)
+    //       const buffer = await sharp
+    //         .png({quality: 85})
+    //         .toBuffer()
+    //
+    //       this.pluginJson.plugins[index].thumb = `data:image/png;base64,${buffer.toString('base64')}`;
+    //     }
+    //   }
+    // }
 
     this.projectId = this.pluginJson.pluginId || crypto
       .createHash('md5')
@@ -210,27 +210,33 @@ class ArenaPluginCompiler {
           const data = {
             varient: key,
             style: '',
+            name: `${key}.css`,
           }
 
           if (exists) {
-            data.style = memfs.readFileSync(file, 'utf-8')
+            data.style = Buffer.from(memfs.readFileSync(file, 'utf-8'))
           }
 
           return data
         },
       )
 
+      this.pluginJson._styles = styleContent.map(s => s.varient);
+
       const plugin = {
-        code: content,
-        styles: styleContent,
+        // code: content,
         id: this.projectId,
         config: this.pluginJson,
         type: 'dev',
         cliVersion: pkg.version,
       }
-      // console.log(plugin)
-      successCallback(prod ? plugin : JSON.stringify(plugin))
-      // successCallback(JSON.stringify(plugin))
+
+      const fileBuffer = {
+        code: Buffer.from(content, 'utf8'),
+        styles: styleContent,
+      }
+
+      successCallback(plugin, fileBuffer)
     })
   }
 

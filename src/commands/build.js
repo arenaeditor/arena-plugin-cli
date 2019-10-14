@@ -1,4 +1,5 @@
 const {Command, flags} = require('@oclif/command')
+const writer = require('arena-file/writer');
 const webpackCompiler = require('../webpack/compiler')
 const t = require('../ui')
 const zlib = require('zlib')
@@ -37,7 +38,7 @@ class BuildCommand extends Command {
     t.pbar().update(percentage)
   }
 
-  compileSuccess(content) {
+  compileSuccess(content, fileBuffer) {
     const {flags} = this.parse(BuildCommand)
 
     t.headerDev()
@@ -61,9 +62,28 @@ class BuildCommand extends Command {
 
     // compress
     const contentBuffer = Buffer.from(JSON.stringify(content), 'utf8')
-    const compressedBuffer = zlib.deflateSync(contentBuffer)
+    // const compressedBuffer = zlib.deflateSync(contentBuffer)
     const savePath = path.resolve(process.cwd(), `${webpackCompiler.id}${content.config.version ? '-' + content.config.version : ''}.arenap`)
-    fs.writeFileSync(savePath, compressedBuffer)
+
+    const w = new writer(savePath)
+    w.setContentVersion(content.config.version || '0.0.0')
+    w.addContent(contentBuffer, 'content.json')
+    w.addContent(fileBuffer.code, 'code.js')
+    for (let index = 0; index < content.config.plugins.length; index += 1) {
+      const p = content.config.plugins[index]
+      p.icon && w.addFile(path.resolve(process.cwd(), p.icon), p.icon)
+      p.thumb && w.addFile(path.resolve(process.cwd(), p.thumb), p.thumb)
+    }
+    content.config.thumb && w.addFile(path.resolve(process.cwd(), content.config.thumb), content.config.thumb)
+
+    // add style
+    fileBuffer.styles.forEach(style => {
+      w.addContent(style.style, style.name)
+    })
+
+    w.write()
+
+    // fs.writeFileSync(savePath, compressedBuffer)
   }
 
   compileWarning(content) {

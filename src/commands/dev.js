@@ -1,4 +1,6 @@
 const {Command} = require('@oclif/command')
+const path = require('path')
+const writer = require('arena-file/writer')
 const webpackCompiler = require('../webpack/compiler')
 const ipc = require('../ipc')
 const t = require('../ui')
@@ -22,7 +24,7 @@ class DevCommand extends Command {
       this.compileError.bind(this),
       this.compileProgress.bind(this),
       this.compileStart.bind(this),
-      this.config.root
+      this.config.root,
     )
   }
 
@@ -35,10 +37,32 @@ class DevCommand extends Command {
     t.pbar().update(percentage)
   }
 
-  compileSuccess(content) {
+  async compileSuccess(content, fileBuffer) {
     t.headerDev()
     t.term.defaultColor('✌️\t').bgBrightGreen('编译成功\n')
-    const err = ipc.sendData(content)
+
+    const savePath = path.resolve(process.cwd(), `dev-image.arenap`)
+    const w = new writer(savePath)
+    w.setContentVersion('0.0.0')
+    w.addContent(Buffer.from(JSON.stringify(content), 'utf-8'), 'content.json')
+    w.addContent(fileBuffer.code, 'code.js')
+    for (let index = 0; index < content.config.plugins.length; index += 1) {
+      const p = content.config.plugins[index]
+      p.icon && w.addFile(path.resolve(process.cwd(), p.icon), p.icon)
+      p.thumb && w.addFile(path.resolve(process.cwd(), p.thumb), p.thumb)
+    }
+    content.config.thumb && w.addFile(path.resolve(process.cwd(), content.config.thumb), content.config.thumb)
+
+    fileBuffer.styles.forEach(style => {
+      w.addContent(style.style, style.name)
+    })
+
+    await w.write()
+
+    const err = ipc.sendData(JSON.stringify({
+      package: content.config.pluginId,
+      image: savePath,
+    }))
     if (err) this.compileError(err)
     else t.term.defaultColor('🚗\t').bgBrightGreen('已更新到 Arena')
   }
