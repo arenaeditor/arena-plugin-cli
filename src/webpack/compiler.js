@@ -45,46 +45,17 @@ class ArenaPluginCompiler {
       return '无法读取 plugin.json 指定的入口文件 ->' + this.pluginEntry
     }
 
-    if (this.pluginJson.icon) {
-      const iconPath = path.resolve(projectPath, this.pluginJson.icon)
-      const ext = path.extname(iconPath)
-      if (fs.existsSync(iconPath) && supportedIconExtension.includes(ext)) {
-        const sharp = new Sharp(iconPath)
-        const buffer = await sharp
-          .resize({width: 64, height: 64, fit: 'cover'})
-          .png({quality: 85})
-          .toBuffer()
+    // if (this.pluginJson.icon) {
+    //   const iconPath = path.resolve(projectPath, this.pluginJson.icon)
+    //   const ext = path.extname(iconPath)
+    //   if (fs.existsSync(iconPath) && supportedIconExtension.includes(ext)) {
+    //     const sharp = new Sharp(iconPath)
+    //     const buffer = await sharp
+    //       .resize({width: 64, height: 64, fit: 'cover'})
+    //       .png({quality: 85})
+    //       .toBuffer()
 
-        this.pluginJson.icon = `data:image/png;base64,${buffer.toString('base64')}`
-      }
-    }
-
-    // for (let index = 0; index < this.pluginJson.plugins.length; index += 1) {
-    //   const pluginIcon = this.pluginJson.plugins[index].icon
-    //   if (pluginIcon) {
-    //     const iconPath = path.resolve(projectPath, pluginIcon)
-    //     const ext = path.extname(iconPath)
-    //     if (fs.existsSync(iconPath) && supportedIconExtension.includes(ext)) {
-    //       const sharp = new Sharp(iconPath)
-    //       const buffer = await sharp
-    //         .resize({width: 64, height: 64, fit: 'cover'})
-    //         .png({quality: 85})
-    //         .toBuffer()
-    //       this.pluginJson.plugins[index].icon = `data:image/png;base64,${buffer.toString('base64')}`;
-    //     }
-    //   }
-    //   const pluginThumb = this.pluginJson.plugins[index].thumb
-    //   if (pluginThumb) {
-    //     const thumbPath = path.resolve(projectPath, pluginThumb)
-    //     const ext = path.extname(thumbPath)
-    //     if (fs.existsSync(thumbPath) && supportedIconExtension.includes(ext)) {
-    //       const sharp = new Sharp(thumbPath)
-    //       const buffer = await sharp
-    //         .png({quality: 85})
-    //         .toBuffer()
-    //
-    //       this.pluginJson.plugins[index].thumb = `data:image/png;base64,${buffer.toString('base64')}`;
-    //     }
+    //     this.pluginJson.icon = `data:image/png;base64,${buffer.toString('base64')}`
     //   }
     // }
 
@@ -230,6 +201,12 @@ class ArenaPluginCompiler {
         type: 'dev',
         cliVersion: pkg.version,
       }
+
+      styleContent.push({
+        varient: 'global',
+        style: Buffer.from(memfs.readFileSync('/plugin_style.css', 'utf-8')),
+        name: 'global.css',
+      });
 
       const fileBuffer = {
         code: Buffer.from(content, 'utf8'),
