@@ -202,11 +202,13 @@ class ArenaPluginCompiler {
         cliVersion: pkg.version,
       }
 
-      styleContent.push({
-        varient: 'global',
-        style: Buffer.from(memfs.readFileSync('/plugin_style.css', 'utf-8')),
-        name: 'global.css',
-      });
+      if (memfs.existsSync('/plugin_style.css')) {
+        styleContent.push({
+          varient: 'global',
+          style: Buffer.from(memfs.readFileSync('/plugin_style.css', 'utf-8')),
+          name: 'global.css',
+        });
+      }
 
       const fileBuffer = {
         code: Buffer.from(content, 'utf8'),
