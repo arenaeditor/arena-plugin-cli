@@ -52,7 +52,15 @@ const answers = [
 ]
 
 class InitCommand extends Command {
+  static args = [
+    { name: 'dirName' },
+  ]
   async run() {
+    const { argv } = this.parse(InitCommand);
+    if (!argv[0]) {
+      this.warn(new Error('require dir name!'));
+      this.exit();
+    }
     for (let ai = 0; ai < answers.length; ai++) {
       const ans = answers[ai];
       const df = ans.default(pluginJsonTemplate, this.config);
@@ -65,31 +73,26 @@ class InitCommand extends Command {
     }
 
      // git命令，远程拉取项目并自定义项目名
-    let cmdStr = `git clone ${TEMPLATE_URL}`;
+    let cmdStr = `git clone ${TEMPLATE_URL} ${argv[0]}`;
     cli.action.start('🔍 正在获取模版');
-     // 在nodejs中执行shell命令，第一个参数是命令，第二个是具体的回调函数
 
+    // 在nodejs中执行shell命令，第一个参数是命令，第二个是具体的回调函数
     exec(cmdStr, (error, stdout, stderr) => {
       if (error) {
-          this.log(error);
-          process.exit();
+        this.warn(new Error(error));
+        this.exit();
       }
-      const base = path.resolve(process.cwd(), 'arena-plugin-template');
+      const base = path.resolve(process.cwd(), argv[0]);
       const configFile = path.resolve(base, 'plugin.json');
 
-      fs.readFile(configFile, 'utf8', (err, data) => {
-        if (err) throw err;
-        const temp = JSON.parse(data);
-        Object.keys(pluginJsonTemplate).forEach(key => {
-          temp[key] = pluginJsonTemplate[key];
-        });
-
-        fs.writeFile(configFile, JSON.stringify(temp, null, 2), (err) => {
-          if (err) throw err;
-          cli.action.stop('🎉  Successfully created project');
-          process.exit();
-        });
+      let temp = fs.readFileSync(configFile);
+      temp = JSON.parse(temp);
+      Object.keys(pluginJsonTemplate).forEach(key => {
+        temp[key] = pluginJsonTemplate[key];
       });
+
+      fs.writeFileSync(configFile, JSON.stringify(temp, null, 2));
+      cli.action.stop(`🎉  Successfully created project ${argv[0]}`);
     });
   }
 }
