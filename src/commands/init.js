@@ -58,7 +58,7 @@ class InitCommand extends Command {
   async run() {
     const { argv } = this.parse(InitCommand);
     if (!argv[0]) {
-      this.warn(new Error('require dir name!'));
+      this.warn(new Error(' Missing required argument <dir-name>.'));
       this.exit();
     }
     for (let ai = 0; ai < answers.length; ai++) {
@@ -92,7 +92,14 @@ class InitCommand extends Command {
       });
 
       fs.writeFileSync(configFile, JSON.stringify(temp, null, 2));
-      cli.action.stop(`🎉  Successfully created project ${argv[0]}`);
+
+      cli.action.stop('done');
+      this.log(`🎉  Successfully created project ${argv[0]}`)
+      this.log(`👉  Get started with the following commands:
+
+        cd ${argv[0]}
+        yarn / npm install
+        yarn dev / npm run dev`);
     });
   }
 }
