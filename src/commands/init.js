@@ -5,7 +5,8 @@ const os = require('os')
 const fs = require('fs')
 const path = require('path')
 
-const { exec } = require('child_process');
+const util = require('util')
+const exec = util.promisify(require('child_process').exec)
 const TEMPLATE_URL = 'https://github.com/arenaeditor/arena-plugin-template.git'
 
 const pluginJsonTemplate = {
@@ -75,32 +76,25 @@ class InitCommand extends Command {
      // git命令，远程拉取项目并自定义项目名
     let cmdStr = `git clone ${TEMPLATE_URL} ${argv[0]}`;
     cli.action.start('🔍 正在获取模版');
+    await exec(cmdStr);
+    await exec(`cd ${argv[0]} && git remote rm origin`);
 
-    // 在nodejs中执行shell命令，第一个参数是命令，第二个是具体的回调函数
-    exec(cmdStr, (error, stdout, stderr) => {
-      if (error) {
-        this.warn(new Error(error));
-        this.exit();
-      }
-      const base = path.resolve(process.cwd(), argv[0]);
-      const configFile = path.resolve(base, 'plugin.json');
-
-      let temp = fs.readFileSync(configFile);
-      temp = JSON.parse(temp);
-      Object.keys(pluginJsonTemplate).forEach(key => {
-        temp[key] = pluginJsonTemplate[key];
-      });
-
-      fs.writeFileSync(configFile, JSON.stringify(temp, null, 2));
-
-      cli.action.stop('done');
-      this.log(`🎉  Successfully created project ${argv[0]}`)
-      this.log(`👉  Get started with the following commands:
-
-        cd ${argv[0]}
-        yarn / npm install
-        yarn dev / npm run dev`);
+    const base = path.resolve(process.cwd(), argv[0]);
+    const configFile = path.resolve(base, 'plugin.json');
+    let temp = fs.readFileSync(configFile);
+    temp = JSON.parse(temp);
+    Object.keys(pluginJsonTemplate).forEach(key => {
+      temp[key] = pluginJsonTemplate[key];
     });
+    fs.writeFileSync(configFile, JSON.stringify(temp, null, 2));
+
+    cli.action.stop('done');
+    this.log(`🎉  Successfully created project ${argv[0]}`)
+    this.log(`👉  Get started with the following commands:
+
+      cd ${argv[0]}
+      yarn || npm install
+      yarn dev || npm run dev`);
   }
 }
 
