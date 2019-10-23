@@ -33,10 +33,11 @@ const answers = [
     q: '📚  插件包名',
     key: 'pluginId',
     default: (ctx, config) => {
-      return crypto
-      .createHash('md5')
-      .update(config.root)
-      .digest('hex')
+      // return crypto
+      // .createHash('md5')
+      // .update(config.root)
+      // .digest('hex')
+      return `arena.plugin.${Math.random().toString(36).slice(2).replace(/\d/g, '')}`;
     },
     required: true,
   },
@@ -69,7 +70,14 @@ class InitCommand extends Command {
       const r = await cli.prompt(ans.q, {
         default: df, 
         required: ans.required || false
-      })
+      });
+      if (ans.key === 'pluginId' && r) {
+        const reg = /([A-Za-z][A-Za-z\d_]*\.)+[A-Za-z][A-Za-z\d_]*/;
+        if (!reg.test(r)) {
+          this.warn(new Error('exp: arena.plugin.xxx'));
+          this.exit();
+        }
+      }
       pluginJsonTemplate[ans.key] = r || df
     }
 
