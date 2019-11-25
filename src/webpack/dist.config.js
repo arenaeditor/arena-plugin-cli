@@ -4,13 +4,15 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const external = path.resolve(__dirname, './provide.js')
 const TerserPlugin = require('terser-webpack-plugin')
 module.exports = function (config, root, prod) {
+  const entry = {...config.extendedEntries}
+  if (config.entry) {
+    entry.plugin = config.entry
+  }
+
   const cfg = {
     mode: 'production',
     devtool: false,
-    entry: {
-      plugin: config.entry,
-      ...config.extendedEntries,
-    },
+    entry,
     module: {
       rules: [
         {
@@ -36,10 +38,10 @@ module.exports = function (config, root, prod) {
             loader: 'babel-loader',
             options: {
               plugins: [
-                [path.resolve(root, 'node_modules', "@babel/plugin-transform-react-jsx"), {
-                  "pragma": "ArenaPluginTrans", // default pragma is React.createElement
-                  "pragmaFrag": "ArenaPluginTrans.f", // default is React.Fragment
-                  "throwIfNamespace": false // defaults to true
+                [path.resolve(root, 'node_modules', '@babel/plugin-transform-react-jsx'), {
+                  'pragma': 'ArenaPluginTrans', // default pragma is React.createElement
+                  'pragmaFrag': 'ArenaPluginTrans.f', // default is React.Fragment
+                  'throwIfNamespace': false, // defaults to true
                 }],
               ],
             },

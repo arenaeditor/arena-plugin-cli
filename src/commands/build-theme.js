@@ -2,110 +2,96 @@ const {Command} = require('@oclif/command')
 const t = require('../ui')
 const fs = require('fs')
 const path = require('path')
-const crypto = require('crypto')
-const Sharp = require('sharp')
+const Writer = require('arena-file/writer')
+const MemoryFS = require('memory-fs')
+const webpack = require('webpack')
+const webpackConfig = require('../webpack/dist.config')
 
-const v1struct = {
-  VERSION: 2,
-  CLEN: 4,
-  CSUM: 32,
-}
+const memfs = new MemoryFS()
 
 class BuildThemeCommand extends Command {
   async run() {
     const pluginJsonPath = path.resolve(process.cwd(), 'plugin.json')
-    let themeFileList = []
     if (fs.existsSync(pluginJsonPath)) {
-      const jsonStr = fs.readFileSync(pluginJsonPath)
-      const json = JSON.parse(jsonStr)
+      const content = require(pluginJsonPath)
+      if (content.theme) {
+        const list = Object.entries(content.theme).map(([id, config]) => {
+          const jsonFile = config.json ? path.resolve(process.cwd(), config.json) : ''
+          const styleFile = config.style ? path.resolve(process.cwd(), config.style) : ''
+          const thumb = config.thumb ? path.resolve(process.cwd(), config.thumb) : ''
+          const contentJson = {
+            id,
+            target: content.pluginId,
+            useValue: jsonFile ? fs.existsSync(jsonFile) : false,
+            useStyle: styleFile ? fs.existsSync(styleFile) : false,
+            thumb: thumb ? fs.existsSync(thumb) : thumb,
+            config,
+          }
 
-      themeFileList = json.theme && Object.entries(json.theme).map(([name, fn]) => {
-        return {
-          name,
-          from: path.resolve(process.cwd(), fn),
-          to: path.resolve(process.cwd(), `${json.pluginId}-${name}.apt`),
+          return {
+            jsonFile,
+            styleFile,
+            thumb,
+            contentJson,
+            version: config.version || content.version,
+          }
+        })
+
+        list.forEach(theme => this.buildThemeFile(theme))
+      }
+    } else {
+      t.term.defaultColor('没有找到 plugin.json 文件😯')
+    }
+  }
+
+  async buildThemeFile(config) {
+    t.term(`正在为 ${config.contentJson.target} 构建主题 ${config.contentJson.id} (${config.version})\n`)
+    const writer = new Writer(path.resolve(process.cwd(), `${config.contentJson.target}-${config.contentJson.id}.apt`))
+    writer.setContentVersion(config.version)
+    if (config.styleFile) {
+      const styleBuffer = await this.bundleStyles(config.contentJson.id, config.styleFile, config.contentJson.target)
+      writer.addContent(styleBuffer, 'style.css', false)
+    }
+
+    if (config.jsonFile) {
+      writer.addFile(config.jsonFile, 'value.json', false)
+    }
+
+    if (config.thumb) {
+      writer.addFile(config.thumb)
+    }
+
+    writer.addContent(Buffer.from(JSON.stringify(config.contentJson)), 'content.json', false)
+    writer.write()
+  }
+
+  async bundleStyles(name, filename, id) {
+    return new Promise((resolve, reject) => {
+      const compiler = webpack(webpackConfig(
+        {
+          id,
+          dist: '/',
+          extendedEntries: {[name]: filename},
+        },
+        this.config.root,
+        true,
+      ))
+
+      compiler.outputFileSystem = memfs
+      const close = compiler.watch({}, (err, stats) => {
+        if (err) {
+          return reject(err.details)
         }
+
+        if (stats.hasErrors()) {
+          return reject(stats.toJson().errors)
+        }
+
+        close.close(() => {
+          resolve(memfs.readFileSync(`/${name}_style.css`))
+        })
       })
-
-      this.buildThemeFiles(themeFileList, json)
-    }
-  }
-
-  buildThemeFiles(list, json) {
-    for (let index = 0; index < list.length; index++) {
-      this.buildThemeFile(list[index], json)
-    }
-  }
-
-  async buildThemeFile(config, json) {
-    t.term(`Building file ${config.from}`)
-    const fVersionBuffer = Buffer.alloc(v1struct.VERSION)
-    const fCLENBuffer = Buffer.alloc(v1struct.CLEN)
-    const fCSUMBuffer = Buffer.alloc(v1struct.CSUM)
-
-    const themeContent = fs.readFileSync(config.from, {encoding: 'utf8'})
-    const themeJson = JSON.parse(themeContent)
-
-    themeJson.targetPlugin = json.pluginId
-    themeJson.name = config.name
-
-    const themeConfig = {
-      content: themeJson,
-      res: {},
-    }
-
-    let range = 0
-    const thumbBuffers = []
-    for (const [varient, config] of Object.entries(themeJson.varients)) {
-      const thumbBuffer = await this.processImage(config.thumb)
-      themeConfig.res[varient] = {
-        name: varient,
-        from: range,
-        size: thumbBuffer.length,
-      }
-      config.thumb = `${varient}.png`
-
-      thumbBuffers.push(thumbBuffer)
-      range += thumbBuffer.length
-    }
-
-    const pluginThumbPath = path.resolve(process.cwd(), themeJson.thumb)
-    if (themeJson.thumb && fs.existsSync(pluginThumbPath)) {
-      const thumbBuffer = await this.processImage(pluginThumbPath)
-
-      themeConfig.res.plugin_thumb = {
-        name: 'plugin_thumb',
-        from: range,
-        size: thumbBuffer.length,
-      }
-
-      themeJson.thumb = 'plugin_thumb.png';
-      thumbBuffers.push(thumbBuffer)
-    }
-
-    const themeContentBuffer = Buffer.from(JSON.stringify(themeConfig), 'utf8')
-
-    const md5 = crypto.createHash('md5').update(themeContentBuffer).digest('hex')
-
-    fVersionBuffer.writeInt16BE(1)
-    fCLENBuffer.writeInt32BE(themeContentBuffer.length)
-    fCSUMBuffer.write(md5)
-
-    const f = fs.createWriteStream(config.to)
-
-    f.write(fVersionBuffer)
-    f.write(fCLENBuffer)
-    f.write(fCSUMBuffer)
-    f.write(themeContentBuffer)
-
-    thumbBuffers.forEach(buffer => f.write(buffer))
-    f.end()
-    f.close()
-  }
-
-  async processImage(fn) {
-    const sharp = new Sharp(path.resolve(process.cwd(), fn))
-    return sharp.png({quality: 85}).toBuffer()
+    })
   }
 }
 

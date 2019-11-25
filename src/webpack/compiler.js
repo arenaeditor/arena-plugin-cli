@@ -6,10 +6,7 @@ const fs = require('fs')
 const crypto = require('crypto')
 const MemoryFS = require('memory-fs')
 const pkg = require('../../package.json')
-const Sharp = require('sharp')
-
 const memfs = new MemoryFS()
-const supportedIconExtension = ['.png', '.jpg', '.jpeg']
 
 class ArenaPluginCompiler {
   constructor() {

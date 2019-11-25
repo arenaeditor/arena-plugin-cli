@@ -2,12 +2,9 @@ const {Command, flags} = require('@oclif/command')
 const writer = require('arena-file/writer')
 const webpackCompiler = require('../webpack/compiler')
 const t = require('../ui')
-const zlib = require('zlib')
 const fs = require('fs')
 const path = require('path')
-const request = require('request')
 const semver = require('semver')
-const userToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkb2MiOiI1ZDY0OWY0YmRlZGM0ZTMyY2Y1NDU4NjYiLCJ1biI6Imhld2VubGkiLCJlbWFpbCI6Imhld2VubGlAMzYwLmNuIiwibmlja25hbWUiOiLkvZXmloflipsiLCJwZXJtcyI6WyJVU0VSIl0sImlzQWRtaW4iOmZhbHNlLCJhZG1pbiI6e30sImlhdCI6MTU3MjMyMDg5MiwiZXhwIjoxNTcyOTI1NjkyLCJpc3MiOiJBUkVOQV9URVNUIn0.0pBfVkcEm__DRU_Qc7PxwlifksgnjFJJlgBi0t_NbIM'
 
 class BuildCommand extends Command {
   async run() {
@@ -54,7 +51,7 @@ class BuildCommand extends Command {
     }
 
     if (content.config.version) {
-      // content.config.version = semver.inc(content.config.version, flags.bump)
+      content.config.version = semver.inc(content.config.version, flags.bump)
       const pluginJson = path.resolve(process.cwd(), 'plugin.json')
       const jsonOnDisk = fs.readFileSync(pluginJson, {encoding: 'utf8'})
       const jsonContent = JSON.parse(jsonOnDisk)
@@ -83,34 +80,9 @@ class BuildCommand extends Command {
       w.addContent(style.style, style.name)
     })
 
-    w.write().then(() => {
-      if (flags.publish) {
-        t.term.defaultColor('正在发布插件')
-        this.uploadPlugin(savePath, content.config)
-      }
-    })
+    w.write()
 
     // fs.writeFileSync(savePath, compressedBuffer)
-  }
-
-  /**
-   * 上传本地打包好的文件
-   * @param filePath
-   * @param config
-   */
-  uploadPlugin(filePath, config) {
-    request({
-      headers: {
-        'Access-Token': userToken,
-      },
-      formData: {
-        file: fs.createReadStream(filePath),
-        id: config.pluginId,
-        version: config.version,
-      },
-      method: 'POST',
-      url: 'http://arena.qiwoo.org/api/license/publish',
-    })
   }
 
   compileWarning(content) {
