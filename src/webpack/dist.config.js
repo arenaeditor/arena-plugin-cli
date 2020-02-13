@@ -8,6 +8,7 @@ module.exports = function (config, root, prod) {
   if (config.entry) {
     entry.plugin = config.entry
   }
+  const babelPresets = [[require(path.resolve(root, 'node_modules', '@babel', 'preset-env')).default, {targets: '> 0.25%, not dead'}]];
 
   const cfg = {
     mode: 'production',
@@ -21,6 +22,7 @@ module.exports = function (config, root, prod) {
           use: {
             loader: 'babel-loader',
             options: {
+              presets: babelPresets,
               plugins: [
                 path.resolve(
                   root,
@@ -37,6 +39,7 @@ module.exports = function (config, root, prod) {
           use: {
             loader: 'babel-loader',
             options: {
+              presets: babelPresets,
               plugins: [
                 [path.resolve(root, 'node_modules', '@babel/plugin-transform-react-jsx'), {
                   'pragma': 'ArenaPluginTrans', // default pragma is React.createElement
@@ -95,11 +98,11 @@ module.exports = function (config, root, prod) {
     plugins: [
       // new webpack.NormalModuleReplacementPlugin(/arena-types/, './types.js'),
       // new webpack.IgnorePlugin('arena-types'),
-      new webpack.ProvidePlugin({
-        document: [external, 'document'],
-        Vue: [external, 'Vue'],
-        // 'arena-types': [external, 'types'],
-      }),
+      // new webpack.ProvidePlugin({
+      //   document: [external, 'document'],
+      //   Vue: [external, 'Vue'],
+      //   // 'arena-types': [external, 'types'],
+      // }),
       new MiniCssExtractPlugin({
         filename: '[name]_style.css',
       }),
@@ -108,6 +111,7 @@ module.exports = function (config, root, prod) {
 
   if (prod) {
     cfg.optimization = {
+      minimize: true,
       minimizer: [new TerserPlugin()],
     }
   }
